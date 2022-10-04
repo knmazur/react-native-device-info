@@ -3,9 +3,9 @@
   "version": "10.2.0",
   "description": "Get device information using react-native",
   "react-native": "src/index.ts",
-  "types": "lib/typescript/index.d.ts",
-  "main": "lib/commonjs/index.js",
-  "module": "lib/module/index.js",
+  "types": "src/index.js.flow",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "files": [
     "__tests__/",
     "android/",

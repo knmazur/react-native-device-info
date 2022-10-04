@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Dimensions, NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { Dimensions, NativeEventEmitter, Platform } from 'react-native';
 import { useOnEvent, useOnMount } from './internal/asyncHookWrappers';
 import devicesWithDynamicIsland from "./internal/devicesWithDynamicIsland";
 import devicesWithNotch from './internal/devicesWithNotch';
@@ -16,6 +16,10 @@ import type {
   LocationProviderInfo,
   PowerState,
 } from './internal/types';
+
+
+const isTurboModuleEnabled = global.__turboModuleProxy != null;
+const constants = isTurboModuleEnabled ? RNDeviceInfo.getConstants() : RNDeviceInfo;
 
 export const [getUniqueId, getUniqueIdSync] = getSupportedPlatformInfoFunctions({
   memoKey: 'uniqueId',
@@ -95,7 +99,7 @@ export const getDeviceId = () =>
   getSupportedPlatformInfoSync({
     defaultValue: 'unknown',
     memoKey: 'deviceId',
-    getter: () => RNDeviceInfo.deviceId,
+    getter: () => constants.deviceId,
     supportedPlatforms: ['android', 'ios', 'windows'],
   });
 
@@ -113,7 +117,7 @@ export const getModel = () =>
     memoKey: 'model',
     defaultValue: 'unknown',
     supportedPlatforms: ['ios', 'android', 'windows'],
-    getter: () => RNDeviceInfo.model,
+    getter: () => constants.model,
   });
 
 export const getBrand = () =>
@@ -121,7 +125,7 @@ export const getBrand = () =>
     memoKey: 'brand',
     supportedPlatforms: ['android', 'ios', 'windows'],
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.brand,
+    getter: () => constants.brand,
   });
 
 export const getSystemName = () =>
@@ -131,7 +135,7 @@ export const getSystemName = () =>
     memoKey: 'systemName',
     getter: () =>
       Platform.select({
-        ios: RNDeviceInfo.systemName,
+        ios: constants.systemName,
         android: 'Android',
         windows: 'Windows',
         default: 'unknown',
@@ -141,7 +145,7 @@ export const getSystemName = () =>
 export const getSystemVersion = () =>
   getSupportedPlatformInfoSync({
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.systemVersion,
+    getter: () => constants.systemVersion,
     supportedPlatforms: ['android', 'ios', 'windows'],
     memoKey: 'systemVersion',
   });
@@ -167,7 +171,7 @@ export const getBundleId = () =>
     memoKey: 'bundleId',
     supportedPlatforms: ['android', 'ios', 'windows'],
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.bundleId,
+    getter: () => constants.bundleId,
   });
 
 export const [
@@ -185,7 +189,7 @@ export const getApplicationName = () =>
   getSupportedPlatformInfoSync({
     memoKey: 'appName',
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.appName,
+    getter: () => constants.appName,
     supportedPlatforms: ['android', 'ios', 'windows'],
   });
 
@@ -193,7 +197,7 @@ export const getBuildNumber = () =>
   getSupportedPlatformInfoSync({
     memoKey: 'buildNumber',
     supportedPlatforms: ['android', 'ios', 'windows'],
-    getter: () => RNDeviceInfo.buildNumber,
+    getter: () => constants.buildNumber,
     defaultValue: 'unknown',
   });
 
@@ -202,7 +206,7 @@ export const getVersion = () =>
     memoKey: 'version',
     defaultValue: 'unknown',
     supportedPlatforms: ['android', 'ios', 'windows'],
-    getter: () => RNDeviceInfo.appVersion,
+    getter: () => constants.appVersion,
   });
 
 export function getReadableVersion() {
@@ -371,7 +375,7 @@ export const isTablet = () =>
     defaultValue: false,
     supportedPlatforms: ['android', 'ios', 'windows'],
     memoKey: 'tablet',
-    getter: () => RNDeviceInfo.isTablet,
+    getter: () => constants.isTablet,
   });
 
 export const [isPinOrFingerprintSet, isPinOrFingerprintSetSync] = getSupportedPlatformInfoFunctions(
@@ -583,7 +587,7 @@ export const getDeviceType = () => {
     memoKey: 'deviceType',
     supportedPlatforms: ['android', 'ios', 'windows'],
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.deviceType,
+    getter: () => constants.deviceType,
   });
 };
 
@@ -592,7 +596,7 @@ export const getDeviceTypeSync = () => {
     memoKey: 'deviceType',
     supportedPlatforms: ['android', 'ios', 'windows'],
     defaultValue: 'unknown',
-    getter: () => RNDeviceInfo.deviceType,
+    getter: () => constants.deviceType,
   });
 };
 
@@ -712,7 +716,7 @@ export async function getDeviceToken() {
   return 'unknown';
 }
 
-const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
+const deviceInfoEmitter = new NativeEventEmitter(module);
 export function useBatteryLevel(): number | null {
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
 

@@ -1,7 +1,9 @@
 import { Platform, NativeModules } from 'react-native';
 import { DeviceInfoNativeModule } from './privateTypes';
 
-let RNDeviceInfo: DeviceInfoNativeModule | undefined = NativeModules.RNDeviceInfo;
+const isTurboModuleEnabled = global.__turboModuleProxy != null;
+
+let RNDeviceInfo: DeviceInfoNativeModule | undefined = isTurboModuleEnabled ? require('../../codegen/NativeRNDeviceInfo').default : NativeModules.RNDeviceInfoModule;
 
 // @ts-ignore
 if (Platform.OS === 'web' || Platform.OS === 'dom') {
